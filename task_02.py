@@ -13,5 +13,10 @@ def input_data():
     print("bonds data", bonds_data)
 
 
-def calculate_data():
+def calculate_data(one_bond_data):
+    day = one_bond_data[0]
+    name = one_bond_data[1]
+    cost = one_bond_data[2]
+    amount = one_bond_data[3]
+
     pass
