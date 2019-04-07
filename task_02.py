@@ -45,57 +45,87 @@ def calculate_data(trader_data, one_bond_data):
 def select_bonds(trader_data, bonds_data):
     money = trader_data[2]
     bonds_select = []
+
+    # Массив стоимостей облигаций при динамическом расчете
     data_table = [[0 for _ in range(0, int(trader_data[2]), 1000)] for _ in range(len(bonds_data) + 1)]
+
+    # Массив доходностей при динамическом расчете
+    # data_gain_table = data_table.copy()
+    data_gain_table = [[0 for _ in range(0, int(trader_data[2]))] for _ in range(len(bonds_data) + 1)]
+
+    # Массив облигаций, входящих в массив доходностей
+    data_bonds_table = [[ [] for _ in range(0, int(trader_data[2]), 1000)] for _ in range(len(bonds_data) + 1)]
+
     print("data_table", data_table)
-    # [[i * j for j in range(m)] for i in range(n)]
+    print("data_bonds_table", data_bonds_table)
+    print("data_gain_table", len(data_gain_table))
 
     bonds_data.sort(key=lambda x: x[6], reverse=True)
 
     gain = 0
+    # for i in range(len(bonds_data)):
+    #     for j in range(int(trader_data[2])):
+    #         # if data_table[i][j - int(bonds_data[i][4] // 1000)] + bonds_data[i][4] > float(data_table[i][j]):
+    #
+    #         if bonds_data[i][4] <= (j + 1) - int(bonds_data[i][4]):
+    #             print("j+1 - int(bonds_data[i][4] // 1000)>>>> ", j + 1 - int(bonds_data[i][4]))
+    #             data_gain_table[i+1][j] = data_gain_table[i][j-int(bonds_data[i][4])] + bonds_data[i][5]
+    #         else:
+    #             data_gain_table[i + 1][j] = data_gain_table[i][j]
+
     for i in range(len(bonds_data)):
-        for j in range((trader_data[2] // 1000)):
-            # print(j, i)
-            # print('data_table[i-1][j]', data_table[i-1][j])
-            # print(bonds_data[i][4])
+        for j in range(int(trader_data[2] // 1000)):
             if bonds_data[i][4] <= (j + 1) * 1000:
-                # print((j + 1) * 1000, bonds_data[i][4])
-                # print("###>>>>", data_table[i][j-int(bonds_data[i][4] // 1000)] + bonds_data[i][4], (j + 1) * 1000)
                 if data_table[i][j - int(bonds_data[i][4] // 1000)] + bonds_data[i][4] <= (j + 1) * 1000:
-                    data_table[i+1][j] = max(float(data_table[i][j]), data_table[i][j-int(bonds_data[i][4] // 1000)] + bonds_data[i][4])
+                    # data_table[i+1][j] = max(float(data_table[i][j]), data_table[i][j-int(bonds_data[i][4] // 1000)] + bonds_data[i][4])
+                    if data_table[i][j-int(bonds_data[i][4] // 1000)] + bonds_data[i][4] > float(data_table[i][j]):
+                        data_table[i+1][j] = data_table[i][j-int(bonds_data[i][4] // 1000)] + bonds_data[i][4]
+                        data_bonds_table[i+1][j] = data_bonds_table[i][j-int(bonds_data[i][4] // 1000)].copy()
+                        data_bonds_table[i+1][j].append(bonds_data[i])
+                    else:
+                        data_table[i+1][j] = float(data_table[i][j])
+                        data_bonds_table[i + 1][j] = data_bonds_table[i][j].copy()
+
                 elif data_table[i][j] + bonds_data[i][4] <= (j + 1) * 1000:
-                    # data_table[i][j]
-                    data_table[i+1][j] = max(float(data_table[i][j] + bonds_data[i][4]), float(bonds_data[i][4]))
+                    # data_table[i+1][j] = max(float(data_table[i][j] + bonds_data[i][4]), float(bonds_data[i][4]))
+                    if float(data_table[i][j] + bonds_data[i][4]) > float(bonds_data[i][4]):
+                        data_table[i + 1][j] = float(data_table[i][j] + bonds_data[i][4])
+                        data_bonds_table[i + 1][j] = (bonds_data[i])
+                        data_bonds_table[i + 1][j].append(data_bonds_table[i][j])
+                    else:
+                        data_table[i + 1][j] = float(bonds_data[i][4])
+                        data_bonds_table[i + 1][j] = bonds_data[i]
                 elif bonds_data[i][4] > data_table[i][j]:
                     data_table[i + 1][j] = bonds_data[i][4]
+                    data_bonds_table[i + 1][j] = bonds_data[i]
                 else:
                     data_table[i + 1][j] = data_table[i][j]
+                    data_bonds_table[i + 1][j] = data_bonds_table[i][j].copy()
             else:
                 data_table[i + 1][j] = data_table[i][j]
+                data_bonds_table[i + 1][j] = data_bonds_table[i][j].copy()
 
-            # if bonds_data[i][4] <= money:
-            #     bonds_select.append(bonds_data[i])
-            #     if money - bonds_data[i][4] >= bonds_data[i+1][4]:
-            #         money -= bonds_data[i][4]
-            #         gain += bonds_data[i][5]
-            #     # else:
-
-    print(">>> ", data_table)
-
-    # pass
+    print("data_table>>> ", data_table)
+    print("data_bonds_table>>> ", data_bonds_table)
+    print("data_gain_table>>> ", data_gain_table)
+    print(data_bonds_table[-1][-1])
 
 
 # if __name__ == "__main__":
 #     main()
 
-
-
 # main()
 
-trader_data = [2, 2, 8000]
-bonds_data = [['1', 'alfa-05', '100.2', '2'], ['2', 'alfa-05', '101.5', '5'], ['2', 'gazprom-17', '100.0', '2']]
 
-extend_bonds_data(trader_data, bonds_data)
-print("bonds data", bonds_data)
+def testing():
+    trader_data = [2, 2, 8000]
+    bonds_data = [['1', 'alfa-05', '100.2', '2'], ['2', 'alfa-05', '101.5', '5'], ['2', 'gazprom-17', '100.0', '2']]
 
-select_bonds(trader_data, bonds_data)
-print("bonds data", bonds_data)
+    extend_bonds_data(trader_data, bonds_data)
+    # print("bonds data", bonds_data)
+
+    select_bonds(trader_data, bonds_data)
+    # print("bonds data", bonds_data)
+
+
+testing()
