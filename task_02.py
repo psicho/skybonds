@@ -6,6 +6,7 @@
 4. Затраченное время: 8 часов.
 """
 
+# Основная функция запуска расчета
 def main():
     trader_data = [int(i) for i in input().split()]
 
@@ -23,13 +24,14 @@ def main():
     select_bonds(trader_data, bonds_data)
 
 
+# Обработка входных данных с занесение в список
 def extend_bonds_data(trader_data, bonds_data):
     for i in range(len(bonds_data)):
         data = calculate_data(trader_data, bonds_data[i])
         bonds_data[i].extend(data)
 
 
-
+# Позиционная обработка входных данных
 def calculate_data(trader_data, one_bond_data):
     day = int(one_bond_data[0])  # День выхода предложения облигации
     name = one_bond_data[1]  # Название облигации
